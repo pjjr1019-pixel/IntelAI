@@ -209,6 +209,61 @@ export interface AnalyticsLifecycle {
   };
 }
 
+export interface AnalyticsKeywordPerformance {
+  time_period_days: number;
+  keywords: Array<{
+    keyword: string;
+    category: string;
+    performance_metrics: {
+      total_appearances: number;
+      avg_rank: number;
+      peak_rank: number;
+      alert_count: number;
+      acknowledged_alerts: number;
+      accuracy_rate_percent: number;
+      current_velocity: number;
+      avg_velocity: number;
+      last_alert_date: string | null;
+    };
+  }>;
+  categories: Array<{
+    category: string;
+    keyword_count: number;
+    avg_rank: number;
+    total_appearances: number;
+    total_alerts: number;
+  }>;
+  summary: {
+    total_keywords_analyzed: number;
+    total_categories: number;
+    avg_accuracy_rate: number;
+    most_active_keyword: string | null;
+  };
+}
+
+export interface AnalyticsSocialMedia {
+  time_period_days: number;
+  social_sources: string[];
+  mention_trends: Array<{
+    date: string;
+    source_name: string;
+    total_mentions: number;
+    avg_engagement: number;
+  }>;
+  engagement_metrics: {
+    total_mentions: number;
+    avg_daily_mentions: number;
+    peak_mention_day: string | null;
+    most_active_source: string | null;
+  };
+  top_keywords: Array<{
+    keyword: string;
+    total_mentions: number;
+    mention_frequency: number;
+  }>;
+  sentiment_distribution: Record<string, number>;
+}
+
 // Google Trends interfaces
 export interface TrendsPreviewRequest {
   keywords: string[];
@@ -280,6 +335,13 @@ export const api = {
   getAnalyticsEffectiveness: (days?: number) => apiRequest(`/api/analytics/alert-effectiveness${days ? `?days=${days}` : ''}`),
   getAnalyticsBusinessImpact: (days?: number) => apiRequest(`/api/analytics/business-impact${days ? `?days=${days}` : ''}`),
   getAnalyticsLifecycle: (days?: number) => apiRequest(`/api/analytics/trend-lifecycle${days ? `?days=${days}` : ''}`),
+  getAnalyticsKeywordPerformance: (days?: number, limit?: number) => {
+    const params = new URLSearchParams();
+    if (days) params.append('days', days.toString());
+    if (limit) params.append('limit', limit.toString());
+    return apiRequest(`/api/analytics/keyword-performance${params.toString() ? `?${params.toString()}` : ''}`);
+  },
+  getAnalyticsSocialMedia: (days?: number) => apiRequest(`/api/analytics/social-media${days ? `?days=${days}` : ''}`),
   // Strategies functions
   getStrategies: (type?: string) => apiRequest(`/api/strategies${type ? `?strategy_type=${type}` : ''}`),
   getStrategy: (id: string) => apiRequest(`/api/strategies/${id}`),
@@ -312,6 +374,12 @@ export const api = {
   // Keyword expansion functions
   getRelatedKeywords: (keyword: string, maxSuggestions: number = 10) => 
     apiRequest(`/api/keyword-expansion/related/${encodeURIComponent(keyword)}?max_suggestions=${maxSuggestions}`),
+  // User preferences functions
+  getUserPreferences: () => apiRequest('/api/user/preferences'),
+  updateUserPreferences: (preferences: Record<string, any>) => apiRequest('/api/user/preferences', {
+    method: 'PUT',
+    body: JSON.stringify(preferences),
+  }),
 };
 
 // WebSocket connection management

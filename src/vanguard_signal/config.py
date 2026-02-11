@@ -89,11 +89,31 @@ class NotificationConfig:
 
 @dataclass(frozen=True)
 class RedditConfig:
-    """Reddit API credentials."""
+    """Reddit API configuration for social media monitoring."""
 
-    client_id: str = os.getenv("VS_REDDIT_CLIENT_ID", os.getenv("REDDIT_CLIENT_ID", ""))
-    client_secret: str = os.getenv("VS_REDDIT_CLIENT_SECRET", os.getenv("REDDIT_CLIENT_SECRET", ""))
-    user_agent: str = os.getenv("VS_REDDIT_USER_AGENT", os.getenv("REDDIT_USER_AGENT", "vanguard-signal/0.1"))
+    client_id: str = os.getenv("VS_REDDIT_CLIENT_ID", "")
+    client_secret: str = os.getenv("VS_REDDIT_CLIENT_SECRET", "")
+    user_agent: str = os.getenv("VS_REDDIT_USER_AGENT", "vanguard_signal:v0.1 (by /u/vanguard)")
+    subreddits: str = os.getenv("VS_REDDIT_SUBREDDITS", "all")
+    search_limit: int = int(os.getenv("VS_REDDIT_SEARCH_LIMIT", "100"))
+
+
+@dataclass(frozen=True)
+class RedisConfig:
+    """Redis cache configuration."""
+
+    host: str = os.getenv("VS_REDIS_HOST", "localhost")
+    port: int = int(os.getenv("VS_REDIS_PORT", "6379"))
+    db: int = int(os.getenv("VS_REDIS_DB", "0"))
+    password: str = os.getenv("VS_REDIS_PASSWORD", "")
+    ssl: bool = os.getenv("VS_REDIS_SSL", "false").lower() == "true"
+    enabled: bool = os.getenv("VS_REDIS_ENABLED", "false").lower() == "true"
+
+    @property
+    def url(self) -> str:
+        auth = f":{self.password}@" if self.password else ""
+        ssl_param = "?ssl=true" if self.ssl else ""
+        return f"redis://{auth}{self.host}:{self.port}/{self.db}{ssl_param}"
 
 
 @dataclass(frozen=True)
@@ -106,6 +126,7 @@ class AppConfig:
     jwt: JWTConfig = field(default_factory=JWTConfig)
     notifications: NotificationConfig = field(default_factory=NotificationConfig)
     reddit: RedditConfig = field(default_factory=RedditConfig)
+    redis: RedisConfig = field(default_factory=RedisConfig)
 
     # Phase flags — toggle features without redeploying
     enable_semantic_engine: bool = os.getenv("VS_SEMANTIC", "false").lower() == "true"

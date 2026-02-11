@@ -6,6 +6,7 @@ import { DashboardWidget } from '../DashboardLayoutProvider';
 
 // Lazy load the Google Trends panel
 const GoogleTrendsPanel = lazy(() => import('../GoogleTrendsPanel'));
+const SocialMediaWidget = lazy(() => import('./SocialMediaWidget'));
 
 interface ChartWidgetProps {
   widget: DashboardWidget;
@@ -25,6 +26,21 @@ export function ChartWidget({ widget }: ChartWidgetProps) {
         </div>
       }>
         <GoogleTrendsPanel />
+      </Suspense>
+    );
+  }
+
+  if (widget.id === 'social-media' || widget.type === 'social-media') {
+    return (
+      <Suspense fallback={
+        <div className="p-8 h-full flex items-center justify-center enterprise-fade-in">
+          <div className="text-center space-y-3">
+            <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
+            <p className="text-muted-foreground font-medium">Loading social media...</p>
+          </div>
+        </div>
+      }>
+        <SocialMediaWidget />
       </Suspense>
     );
   }

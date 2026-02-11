@@ -1,16 +1,39 @@
 """
-cache.py — Simple caching utilities for API responses.
+cache.py — Caching utilities for API responses with Redis support.
 """
 
 from __future__ import annotations
 
 import asyncio
+import json
 import time
 from functools import wraps
 from typing import Any, Callable, Dict, Optional
 
+try:
+    import redis.asyncio as redis
+    REDIS_AVAILABLE = True
+except ImportError:
+    redis = None
+    REDIS_AVAILABLE = False
 
-class SimpleCache:
+from vanguard_signal.config import settings
+
+
+class CacheBackend:
+    """Abstract cache backend interface."""
+
+    async def get(self, key: str) -> Optional[Any]:
+        raise NotImplementedError
+
+    async def set(self, key: str, value: Any, ttl_seconds: int) -> None:
+        raise NotImplementedError
+
+    async def clear(self, pattern: Optional[str] = None) -> None:
+        raise NotImplementedError
+
+
+class MemoryCache(CacheBackend):
     """Simple in-memory cache with TTL support."""
 
     def __init__(self):
@@ -48,8 +71,85 @@ class SimpleCache:
                 self._cache.clear()
 
 
+class RedisCache(CacheBackend):
+    """Redis-based cache backend."""
+
+    def __init__(self):
+        if not REDIS_AVAILABLE:
+            raise RuntimeError("Redis package not available")
+
+        self._redis = redis.Redis.from_url(settings.redis.url, decode_responses=True)
+        self._lock = asyncio.Lock()
+
+    async def get(self, key: str) -> Optional[Any]:
+        """Get cached value from Redis."""
+        try:
+            data = await self._redis.get(key)
+            if data:
+                return json.loads(data)
+        except Exception:
+            # If Redis fails, return None (fail gracefully)
+            pass
+        return None
+
+    async def set(self, key: str, value: Any, ttl_seconds: int) -> None:
+        """Set cached value in Redis with TTL."""
+        try:
+            json_data = json.dumps(value)
+            await self._redis.setex(key, ttl_seconds, json_data)
+        except Exception:
+            # If Redis fails, ignore (fail gracefully)
+            pass
+
+    async def clear(self, pattern: Optional[str] = None) -> None:
+        """Clear cache entries matching pattern or all if no pattern."""
+        try:
+            if pattern:
+                # Use SCAN to find keys matching pattern
+                keys = []
+                async for key in self._redis.scan_iter(pattern):
+                    keys.append(key)
+                if keys:
+                    await self._redis.delete(*keys)
+            else:
+                await self._redis.flushdb()
+        except Exception:
+            # If Redis fails, ignore (fail gracefully)
+            pass
+
+
+class Cache:
+    """Unified cache interface that automatically chooses backend."""
+
+    def __init__(self):
+        if settings.redis.enabled and REDIS_AVAILABLE:
+            try:
+                self._backend = RedisCache()
+                self._backend_type = "redis"
+            except Exception:
+                # Fall back to memory cache if Redis fails
+                self._backend = MemoryCache()
+                self._backend_type = "memory"
+        else:
+            self._backend = MemoryCache()
+            self._backend_type = "memory"
+
+    async def get(self, key: str) -> Optional[Any]:
+        return await self._backend.get(key)
+
+    async def set(self, key: str, value: Any, ttl_seconds: int) -> None:
+        await self._backend.set(key, value, ttl_seconds)
+
+    async def clear(self, pattern: Optional[str] = None) -> None:
+        await self._backend.clear(pattern)
+
+    @property
+    def backend_type(self) -> str:
+        return self._backend_type
+
+
 # Global cache instance
-_cache = SimpleCache()
+cache = Cache()
 
 
 def cached(ttl_seconds: int = 300, key_prefix: str = ""):
@@ -76,7 +176,7 @@ def cached(ttl_seconds: int = 300, key_prefix: str = ""):
 
             # Execute function and cache result
             result = await func(*args, **kwargs)
-            await _cache.set(cache_key, result, ttl_seconds)
+            await cache.set(cache_key, result, ttl_seconds)
             return result
 
         return wrapper
@@ -84,5 +184,5 @@ def cached(ttl_seconds: int = 300, key_prefix: str = ""):
 
 
 async def clear_cache(pattern: Optional[str] = None) -> None:
-    """Clear cache entries. Use pattern to clear specific entries."""
-    await _cache.clear(pattern)
+    """Clear cache entries. Use pattern to allow selective clearing."""
+    await cache.clear(pattern)

@@ -912,7 +912,12 @@ export default function GoogleTrendsPanel({ className = '' }: GoogleTrendsPanelP
                             
                             // Generate predictions for each selected trend
                             const promises = selectedData.map(trend => 
-                              api.forecastTrend(trend.keyword, geo, '24h', 'exponential_smoothing', 0.95)
+                              api.getTrendPrediction(trend.keyword, {
+                                geo,
+                                horizon: '24h',
+                                algorithm: 'exponential_smoothing',
+                                confidence: 0.95
+                              })
                             );
                             
                             const results = await Promise.allSettled(promises);
