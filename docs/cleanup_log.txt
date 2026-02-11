@@ -1,0 +1,101 @@
+Intel-AI Directory Cleanup Log
+==================================================
+
+File: __pycache__
+Size: 18008 bytes
+Action: deleted
+Description: Python cache directory
+Timestamp: 2026-02-10T20:29:37.942195
+------------------------------
+
+File: .venv\Lib\site-packages\_distutils_hack\__pycache__
+Size: 7601 bytes
+Action: deleted
+Description: Python cache directory
+Timestamp: 2026-02-10T20:29:38.078442
+------------------------------
+
+File: src\vanguard_signal\__pycache__
+Size: 55057 bytes
+Action: deleted
+Description: Python cache directory
+Timestamp: 2026-02-10T20:29:38.167049
+------------------------------
+
+File: src\vanguard_signal\api\__pycache__
+Size: 62537 bytes
+Action: deleted
+Description: Python cache directory
+Timestamp: 2026-02-10T20:29:38.167049
+------------------------------
+
+File: src\vanguard_signal\api\routes\__pycache__
+Size: 234179 bytes
+Action: deleted
+Description: Python cache directory
+Timestamp: 2026-02-10T20:29:38.167049
+------------------------------
+
+File: src\vanguard_signal\detection\__pycache__
+Size: 53538 bytes
+Action: deleted
+Description: Python cache directory
+Timestamp: 2026-02-10T20:29:38.167049
+------------------------------
+
+File: src\vanguard_signal\ingestion\__pycache__
+Size: 13665 bytes
+Action: deleted
+Description: Python cache directory
+Timestamp: 2026-02-10T20:29:38.167049
+------------------------------
+
+File: src\vanguard_signal\ingestion\connectors\__pycache__
+Size: 30449 bytes
+Action: deleted
+Description: Python cache directory
+Timestamp: 2026-02-10T20:29:38.167049
+------------------------------
+
+File: src\vanguard_signal\narrative\__pycache__
+Size: 10954 bytes
+Action: deleted
+Description: Python cache directory
+Timestamp: 2026-02-10T20:29:38.178744
+------------------------------
+
+File: src\vanguard_signal\notifications\__pycache__
+Size: 19418 bytes
+Action: deleted
+Description: Python cache directory
+Timestamp: 2026-02-10T20:29:38.178744
+------------------------------
+
+File: src\vanguard_signal\prediction\__pycache__
+Size: 35984 bytes
+Action: deleted
+Description: Python cache directory
+Timestamp: 2026-02-10T20:29:38.178744
+------------------------------
+
+File: src\vanguard_signal\schema\__pycache__
+Size: 30012 bytes
+Action: deleted
+Description: Python cache directory
+Timestamp: 2026-02-10T20:29:38.181560
+------------------------------
+
+File: src\vanguard_signal\schema\models\__pycache__
+Size: 126204 bytes
+Action: deleted
+Description: Python cache directory
+Timestamp: 2026-02-10T20:29:38.181560
+------------------------------
+
+File: dashboard\.next
+Size: 16302952 bytes
+Action: deleted
+Description: Next.js build directory
+Timestamp: 2026-02-10T20:29:38.812751
+------------------------------
+

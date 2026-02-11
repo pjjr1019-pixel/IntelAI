@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Environment
+.env
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Data (generated at runtime)
+data/rl_priors.json
+
+# Docker volumes
+pgdata/
+promdata/
+grafanadata/
+
+# Node.js and Next.js
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Installers and large binaries
+*.exe
+*.msi
+*.dmg
+*.pkg
+*.deb
+*.rpm
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.bak

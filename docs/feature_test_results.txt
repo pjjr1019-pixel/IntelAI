@@ -1,0 +1,39 @@
+Intel-AI Automated Test Results
+==================================================
+
+Feature: is_sqlite
+Test: Test function is_sqlite with mock inputs
+Inputs: {'function_info': {'name': 'is_sqlite', 'file': 'src\\vanguard_signal\\config.py', 'line': 44, 'args': ['self']}}
+Expected: Success with expected behavior
+Actual: Function definition found
+Status: PASS
+Timestamp: 2026-02-10T19:25:43.882276
+------------------------------
+
+Feature: url
+Test: Test function url with mock inputs
+Inputs: {'function_info': {'name': 'url', 'file': 'src\\vanguard_signal\\config.py', 'line': 48, 'args': ['self']}}
+Expected: Success with expected behavior
+Actual: Function definition found
+Status: PASS
+Timestamp: 2026-02-10T19:25:43.882276
+------------------------------
+
+Feature: sync_url
+Test: Test function sync_url with mock inputs
+Inputs: {'function_info': {'name': 'sync_url', 'file': 'src\\vanguard_signal\\config.py', 'line': 57, 'args': ['self']}}
+Expected: Success with expected behavior
+Actual: Function definition found
+Status: PASS
+Timestamp: 2026-02-10T19:25:43.882276
+------------------------------
+
+Feature: DATABASE_URL
+Test: Test function DATABASE_URL with mock inputs
+Inputs: {'function_info': {'name': 'DATABASE_URL', 'file': 'src\\vanguard_signal\\config.py', 'line': 123, 'args': ['self']}}
+Expected: Success with expected behavior
+Actual: Function definition found
+Status: PASS
+Timestamp: 2026-02-10T19:25:43.882276
+------------------------------
+

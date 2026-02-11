@@ -1,0 +1,131 @@
+# ═══════════════════════════════════════════════════════════════════════
+# Vanguard Signal — docker-compose for local development
+# ═══════════════════════════════════════════════════════════════════════
+# Usage:
+#   docker-compose up -d          # start all services
+#   docker-compose logs -f api    # tail API logs
+#   docker-compose down -v        # stop + remove volumes
+# ═══════════════════════════════════════════════════════════════════════
+
+services:
+  # ── PostgreSQL ─────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: vanguard_signal
+      POSTGRES_USER: vanguard
+      POSTGRES_PASSWORD: ${VS_DB_PASSWORD:-changeme}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vanguard -d vanguard_signal"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Database Migrations ────────────────────────────────────────────
+  migrate:
+    build: .
+    command: >
+      sh -c "alembic upgrade head"
+    environment:
+      VS_DB_HOST: db
+      VS_DB_PORT: 5432
+      VS_DB_NAME: vanguard_signal
+      VS_DB_USER: vanguard
+      VS_DB_PASSWORD: ${VS_DB_PASSWORD:-changeme}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ── API Server ─────────────────────────────────────────────────────
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      VS_ENV: development
+      VS_LOG_LEVEL: INFO
+      VS_DB_HOST: db
+      VS_DB_PORT: 5432
+      VS_DB_NAME: vanguard_signal
+      VS_DB_USER: vanguard
+      VS_DB_PASSWORD: ${VS_DB_PASSWORD:-changeme}
+      VS_SEMANTIC: "false"
+      VS_BACKTEST: "true"
+      VS_RL_FEEDBACK: "true"
+      VS_JWT_SECRET: ${VS_JWT_SECRET:-vanguard-dev-secret-change-me}
+      # Notifications (optional)
+      VS_NOTIFY_SLACK_URL: ${VS_NOTIFY_SLACK_URL:-}
+      VS_NOTIFY_EMAIL_HOST: ${VS_NOTIFY_EMAIL_HOST:-}
+      VS_NOTIFY_EMAIL_PORT: ${VS_NOTIFY_EMAIL_PORT:-587}
+      VS_NOTIFY_EMAIL_USER: ${VS_NOTIFY_EMAIL_USER:-}
+      VS_NOTIFY_EMAIL_PASS: ${VS_NOTIFY_EMAIL_PASS:-}
+      VS_NOTIFY_EMAIL_FROM: ${VS_NOTIFY_EMAIL_FROM:-}
+      VS_NOTIFY_EMAIL_TO: ${VS_NOTIFY_EMAIL_TO:-}
+      VS_NOTIFY_WEBHOOK_URL: ${VS_NOTIFY_WEBHOOK_URL:-}
+      VS_NOTIFY_WEBHOOK_SECRET: ${VS_NOTIFY_WEBHOOK_SECRET:-}
+      # Reddit
+      VS_REDDIT_CLIENT_ID: ${VS_REDDIT_CLIENT_ID:-}
+      VS_REDDIT_CLIENT_SECRET: ${VS_REDDIT_CLIENT_SECRET:-}
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    # restart: unless-stopped  # REMOVED: Prevents auto-restart after system reboot
+
+  # ── Ingestion Worker (runs scheduler) ──────────────────────────────
+  ingestion:
+    build: .
+    command: ["python", "-m", "vanguard_signal.ingestion"]
+    environment:
+      VS_ENV: development
+      VS_LOG_LEVEL: INFO
+      VS_DB_HOST: db
+      VS_DB_PORT: 5432
+      VS_DB_NAME: vanguard_signal
+      VS_DB_USER: vanguard
+      VS_DB_PASSWORD: ${VS_DB_PASSWORD:-changeme}
+      VS_INGEST_INTERVAL: "3600"
+      VS_GTRENDS_TIMEFRAME: "now 7-d"
+      VS_WIKI_LOOKBACK_DAYS: "30"
+    depends_on:
+      api:
+        condition: service_healthy
+    # restart: unless-stopped  # REMOVED: Prevents auto-restart after system reboot
+
+  # ── Prometheus (metrics collection) ────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./deploy/prometheus.yml:/etc/prometheus/prometheus.yml
+      - promdata:/prometheus
+    depends_on:
+      - api
+
+  # ── Grafana (dashboards) ───────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafanadata:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+volumes:
+  pgdata:
+  promdata:
+  grafanadata:

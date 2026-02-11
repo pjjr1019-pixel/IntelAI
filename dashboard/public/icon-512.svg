@@ -1,0 +1,34 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e293b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" fill="url(#bgGradient)" rx="64" ry="64"/>
+
+  <!-- Geometric accent elements -->
+  <circle cx="100" cy="100" r="30" fill="#3b82f6" opacity="0.3"/>
+  <circle cx="412" cy="412" r="25" fill="#06b6d4" opacity="0.3"/>
+  <rect x="50" y="450" width="40" height="4" fill="#8b5cf6" opacity="0.4" rx="2"/>
+  <rect x="422" y="50" width="35" height="4" fill="#3b82f6" opacity="0.4" rx="2"/>
+
+  <!-- Main text -->
+  <text x="256" y="220" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="url(#textGradient)">Intel</text>
+  <text x="256" y="280" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="url(#textGradient)">AI</text>
+
+  <!-- Tech circuit pattern -->
+  <g opacity="0.2" stroke="#3b82f6" stroke-width="1" fill="none">
+    <path d="M150 350 L200 350 L200 400"/>
+    <path d="M312 350 L362 350 L362 400"/>
+    <circle cx="200" cy="350" r="3"/>
+    <circle cx="362" cy="350" r="3"/>
+  </g>
+</svg>

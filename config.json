@@ -1,0 +1,29 @@
+{
+  "directories": {
+    "root": ".",
+    "backup": "./backup",
+    "logs": "./logs"
+  },
+  "cleanup": {
+    "patterns": ["*.pyc", "*.pyo", "__pycache__", "*.log", "*.tmp", "*.cache"],
+    "skip_patterns": ["*.py", "*.js", "*.ts", "*.tsx", "*.json", "*.md", "*.txt", "*.yml", "*.yaml"],
+    "max_age_days": 7,
+    "backup_before_delete": true
+  },
+  "testing": {
+    "timeout": 30,
+    "retries": 3,
+    "parallel_workers": 4,
+    "api_base_url": "http://localhost:8000",
+    "frontend_url": "http://localhost:3000"
+  },
+  "alerts": {
+    "enabled": false,
+    "email": "",
+    "discord_webhook": ""
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(levelname)s - %(message)s"
+  }
+}

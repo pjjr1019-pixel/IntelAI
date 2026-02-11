@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "updated_at": "2026-02-11T05:47:25.382005+00:00",
+  "keywords": {
+    "finance": [
+      "bank run",
+      "bank failure",
+      "FDIC",
+      "credit default swap",
+      "liquidity crisis",
+      "bond yield",
+      "dollar collapse",
+      "treasury sell-off",
+      "margin call",
+      "systemic risk"
+    ],
+    "geopolitical": [
+      "martial law",
+      "coup",
+      "military mobilization",
+      "sanctions",
+      "embassy evacuation",
+      "nuclear threat",
+      "territorial dispute",
+      "ceasefire violation"
+    ],
+    "health": [
+      "pandemic",
+      "quarantine",
+      "disease outbreak",
+      "hospital overflow",
+      "vaccine shortage",
+      "WHO emergency",
+      "bird flu",
+      "antibiotic resistance"
+    ],
+    "civil_unrest": [
+      "protest",
+      "riot",
+      "curfew",
+      "supply shortage",
+      "power grid failure",
+      "water crisis",
+      "mass migration",
+      "food price spike"
+    ],
+    "custom": [
+      "test signal",
+      "default category keyword"
+    ],
+    "tests": []
+  }
+}
