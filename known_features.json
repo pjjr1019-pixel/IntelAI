@@ -5990,5 +5990,25 @@
   "function:src.vanguard_signal.ingestion.watchlist.remove_keywords": {
     "detected_at": "2026-02-10T23:53:35.243479",
     "last_tested": null
+  },
+  "class:src.vanguard_signal.api.routes.trending.HTTPException": {
+    "detected_at": "2026-02-11T01:43:47.313290",
+    "last_tested": null
+  },
+  "function:src.vanguard_signal.api.routes.user_preferences.get_current_user_optional": {
+    "detected_at": "2026-02-11T01:43:47.313290",
+    "last_tested": null
+  },
+  "class:tools.headless_check.datetime": {
+    "detected_at": "2026-02-11T01:43:47.314306",
+    "last_tested": null
+  },
+  "function:tools.headless_check.mock_trending": {
+    "detected_at": "2026-02-11T01:43:47.314306",
+    "last_tested": null
+  },
+  "function:tools.headless_check.sync_playwright": {
+    "detected_at": "2026-02-11T01:43:47.314306",
+    "last_tested": null
   }
 }

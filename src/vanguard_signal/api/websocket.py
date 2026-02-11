@@ -344,3 +344,89 @@ async def test_endpoint():
         "config_env": config.settings.env,
         "message": "WebSocket router is loaded"
     }
+
+
+@router.websocket("/ws/analytics")
+async def analytics_websocket_endpoint(
+    ws: WebSocket,
+    token: str = Query(""),
+) -> None:
+    """
+    WebSocket endpoint for real-time analytics updates.
+
+    Pushes live analytics data updates to connected clients.
+
+    Query params:
+      token — JWT bearer token for authentication (optional in dev)
+    """
+    logger.info("Analytics WebSocket endpoint called with token='%s'", token)
+
+    # Authenticate (skip in dev if no token provided)
+    env_check = os.getenv("VS_ENV", "development")
+    if token:
+        try:
+            from vanguard_signal.config import settings as _cfg
+            jwt.decode(token, _cfg.jwt.secret, algorithms=[_cfg.jwt.algorithm])
+            logger.info("Analytics WebSocket authenticated with token")
+        except jwt.InvalidTokenError:
+            logger.error("Analytics WebSocket invalid token")
+            await ws.close(code=4001, reason="Invalid token")
+            return
+    elif env_check != "development":
+        logger.error("Analytics WebSocket auth required but not in development mode")
+        await ws.close(code=4001, reason="Authentication required")
+        return
+
+    logger.info("Analytics WebSocket authentication passed")
+
+    await ws.accept()
+    logger.info("Analytics WebSocket client connected")
+
+    # Send a connection confirmation message
+    try:
+        await ws.send_json({
+            "type": "connected",
+            "message": "Analytics WebSocket connected",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        })
+    except Exception as e:
+        logger.error("Failed to send connection message: %s", e)
+        return
+
+    try:
+        while True:
+            # Keep connection alive and wait for client messages
+            # Clients can send ping messages or subscription requests
+            try:
+                data = await asyncio.wait_for(ws.receive_text(), timeout=60.0)
+                logger.debug("Received message from analytics client: %s", data)
+
+                # For now, just acknowledge
+                await ws.send_json({
+                    "type": "ack",
+                    "message": "Connection active",
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                })
+
+            except asyncio.TimeoutError:
+                # Send analytics update
+                try:
+                    # TODO: Fetch current analytics data
+                    # For now, send a placeholder
+                    await ws.send_json({
+                        "type": "analytics_update",
+                        "data": {
+                            "total_entities": 0,  # TODO: get from DB
+                            "active_trends": 0,
+                            "alerts_today": 0,
+                        },
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                    })
+                except Exception as e:
+                    logger.error("Failed to send analytics update: %s", e)
+                    break
+
+    except WebSocketDisconnect:
+        logger.info("Analytics WebSocket client disconnected")
+    except Exception as exc:
+        logger.error("Analytics WebSocket error: %s", exc)

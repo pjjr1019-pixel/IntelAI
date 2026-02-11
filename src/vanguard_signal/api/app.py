@@ -710,6 +710,7 @@ def create_app() -> FastAPI:
             trending_history,
             user_preferences,
             watchlist,
+            websockets,
             ai_control,
         )
         return {
@@ -739,6 +740,7 @@ def create_app() -> FastAPI:
             'strategies': strategies,
             'trading': trading,
             'user_preferences': user_preferences,
+            'websockets': websockets,
             'ai_control': ai_control,
         }
 

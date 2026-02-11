@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { BarChart3, TrendingUp, Target, DollarSign, Clock, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api, websocketManager } from '@/lib/api';
 import {
   AnalyticsPerformance,
   AnalyticsEffectiveness,
@@ -59,6 +59,19 @@ export default function AnalyticsPage() {
   useEffect(() => {
     fetchAnalytics();
 
+    // Connect to WebSocket for real-time updates
+    websocketManager.connect();
+
+    // Listen for analytics updates
+    const handleAnalyticsUpdate = (data: any) => {
+      console.log('Received analytics update:', data);
+      // TODO: Update state with real-time data
+      // For now, just refresh the data
+      fetchAnalytics(true);
+    };
+
+    websocketManager.on('analytics_update', handleAnalyticsUpdate);
+
     let interval: NodeJS.Timeout | null = null;
 
     if (autoRefreshInterval > 0) {
@@ -69,6 +82,7 @@ export default function AnalyticsPage() {
     }
 
     return () => {
+      websocketManager.off('analytics_update', handleAnalyticsUpdate);
       if (interval) clearInterval(interval);
     };
   }, [fetchAnalytics, autoRefreshInterval]);

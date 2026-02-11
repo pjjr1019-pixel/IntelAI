@@ -313,3 +313,90 @@ export const api = {
   getRelatedKeywords: (keyword: string, maxSuggestions: number = 10) => 
     apiRequest(`/api/keyword-expansion/related/${encodeURIComponent(keyword)}?max_suggestions=${maxSuggestions}`),
 };
+
+// WebSocket connection management
+class WebSocketManager {
+  private ws: WebSocket | null = null;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 5;
+  private reconnectDelay = 1000;
+  private listeners: Map<string, ((data: any) => void)[]> = new Map();
+
+  connect() {
+    if (this.ws?.readyState === WebSocket.OPEN) return;
+
+    const token = typeof window !== 'undefined' ? localStorage.getItem('vs_token') : null;
+    const url = `${BASE.replace('http', 'ws')}/ws/analytics${token ? `?token=${token}` : ''}`;
+
+    this.ws = new WebSocket(url);
+
+    this.ws.onopen = () => {
+      console.log('Analytics WebSocket connected');
+      this.reconnectAttempts = 0;
+      this.emit('connected', { timestamp: new Date().toISOString() });
+    };
+
+    this.ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        this.emit(data.type, data);
+      } catch (error) {
+        console.error('Failed to parse WebSocket message:', error);
+      }
+    };
+
+    this.ws.onclose = () => {
+      console.log('Analytics WebSocket disconnected');
+      this.emit('disconnected', { timestamp: new Date().toISOString() });
+      this.attemptReconnect();
+    };
+
+    this.ws.onerror = (error) => {
+      console.error('Analytics WebSocket error:', error);
+      this.emit('error', error);
+    };
+  }
+
+  disconnect() {
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+    }
+  }
+
+  private attemptReconnect() {
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++;
+      setTimeout(() => {
+        console.log(`Attempting to reconnect WebSocket (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+        this.connect();
+      }, this.reconnectDelay * this.reconnectAttempts);
+    }
+  }
+
+  on(event: string, callback: (data: any) => void) {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, []);
+    }
+    this.listeners.get(event)!.push(callback);
+  }
+
+  off(event: string, callback: (data: any) => void) {
+    const listeners = this.listeners.get(event);
+    if (listeners) {
+      const index = listeners.indexOf(callback);
+      if (index > -1) {
+        listeners.splice(index, 1);
+      }
+    }
+  }
+
+  private emit(event: string, data: any) {
+    const listeners = this.listeners.get(event);
+    if (listeners) {
+      listeners.forEach(callback => callback(data));
+    }
+  }
+}
+
+export const websocketManager = new WebSocketManager();
