@@ -502,7 +502,7 @@ export default function GoogleTrendsPanel({ className = '' }: GoogleTrendsPanelP
       }
     };
 
-    // connectWebSocket(); // Disabled due to WebSocket connection issues
+    connectWebSocket();
 
     return () => {
       if (wsRef.current) {

@@ -6010,5 +6010,61 @@
   "function:tools.headless_check.sync_playwright": {
     "detected_at": "2026-02-11T01:43:47.314306",
     "last_tested": null
+  },
+  "class:src.vanguard_signal.websocket_manager.ConnectionManager": {
+    "detected_at": "2026-02-11T07:39:06.687627",
+    "last_tested": null
+  },
+  "class:src.vanguard_signal.websocket_manager.WebSocket": {
+    "detected_at": "2026-02-11T07:39:06.687627",
+    "last_tested": null
+  },
+  "class:src.vanguard_signal.api.cache.Cache": {
+    "detected_at": "2026-02-11T07:39:06.687627",
+    "last_tested": null
+  },
+  "class:src.vanguard_signal.api.cache.CacheBackend": {
+    "detected_at": "2026-02-11T07:39:06.687627",
+    "last_tested": null
+  },
+  "class:src.vanguard_signal.api.cache.MemoryCache": {
+    "detected_at": "2026-02-11T07:39:06.687627",
+    "last_tested": null
+  },
+  "class:src.vanguard_signal.api.cache.RedisCache": {
+    "detected_at": "2026-02-11T07:39:06.687627",
+    "last_tested": null
+  },
+  "function:src.vanguard_signal.api.websocket.analytics_websocket_endpoint": {
+    "detected_at": "2026-02-11T07:39:06.687627",
+    "last_tested": null
+  },
+  "class:src.vanguard_signal.api.routes.analytics.NormalizedEvent": {
+    "detected_at": "2026-02-11T07:39:06.687627",
+    "last_tested": null
+  },
+  "class:src.vanguard_signal.api.routes.analytics.SourceRegistry": {
+    "detected_at": "2026-02-11T07:39:06.687627",
+    "last_tested": null
+  },
+  "class:src.vanguard_signal.api.routes.analytics.SourceType": {
+    "detected_at": "2026-02-11T07:39:06.687627",
+    "last_tested": null
+  },
+  "function:src.vanguard_signal.api.routes.analytics.keyword_performance_analytics": {
+    "detected_at": "2026-02-11T07:39:06.687627",
+    "last_tested": null
+  },
+  "function:src.vanguard_signal.api.routes.analytics.social_media_analytics": {
+    "detected_at": "2026-02-11T07:39:06.687627",
+    "last_tested": null
+  },
+  "function:src.vanguard_signal.api.routes.dashboard.test_endpoint": {
+    "detected_at": "2026-02-11T07:39:06.687627",
+    "last_tested": null
+  },
+  "class:src.vanguard_signal.desktop.notifier.Notification": {
+    "detected_at": "2026-02-11T07:40:49.855194",
+    "last_tested": null
   }
 }

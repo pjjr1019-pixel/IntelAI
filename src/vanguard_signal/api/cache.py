@@ -170,7 +170,7 @@ def cached(ttl_seconds: int = 300, key_prefix: str = ""):
             cache_key = "|".join(key_parts)
 
             # Try to get from cache
-            cached_result = await _cache.get(cache_key)
+            cached_result = await cache.get(cache_key)
             if cached_result is not None:
                 return cached_result
 
@@ -186,3 +186,7 @@ def cached(ttl_seconds: int = 300, key_prefix: str = ""):
 async def clear_cache(pattern: Optional[str] = None) -> None:
     """Clear cache entries. Use pattern to allow selective clearing."""
     await cache.clear(pattern)
+
+
+# Create global cache instance
+cache = Cache()

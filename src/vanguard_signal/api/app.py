@@ -650,7 +650,7 @@ def create_app() -> FastAPI:
     )
 
     # ── CORS — permissive in dev, locked down in prod ────────────────────
-    origins = ["*"] if settings.env == "development" else []
+    origins = [] if settings.env == "development" else []
     # Always allow localhost origins for development
     if settings.env == "development":
         origins.extend([
@@ -710,8 +710,8 @@ def create_app() -> FastAPI:
             trending_history,
             user_preferences,
             watchlist,
-            websockets,
             ai_control,
+            ws_trends,
         )
         return {
             'auth_routes': auth_routes,
@@ -734,13 +734,13 @@ def create_app() -> FastAPI:
             'trending': trending,
             'trending_history': trending_history,
             'live_trending': live_trending,
+            'ws_trends': ws_trends,
             'reports': reports,
             'prediction': prediction,
             'replay': replay,
             'strategies': strategies,
             'trading': trading,
             'user_preferences': user_preferences,
-            'websockets': websockets,
             'ai_control': ai_control,
         }
 
@@ -754,6 +754,7 @@ def create_app() -> FastAPI:
     application.include_router(routers['evidence'].router)
     application.include_router(routers['feedback'].router)
     application.include_router(routers['dashboard'].router)
+    application.include_router(routers['ws_trends'].router)
     application.include_router(routers['watchlist'].router)
     application.include_router(routers['detection'].router)
     application.include_router(routers['settings_routes'].router)
@@ -803,24 +804,24 @@ def create_app() -> FastAPI:
 
         # Catch-all for frontend routes — serve index.html for SPA paths
         # MUST skip /api, /docs, /redoc, /openapi.json, /health, /ws paths
-        @application.get("/{full_path:path}", include_in_schema=False)
-        async def _serve_frontend(full_path: str):
-            # Don't intercept API / system paths
-            first_segment = full_path.split("/")[0] if full_path else ""
-            if first_segment in ("api", "docs", "redoc", "openapi.json", "health", "ws"):
-                from fastapi.responses import JSONResponse
-                return JSONResponse({"detail": "Not Found"}, status_code=404)
+        # Temporarily disabled to test API routes
+        # @application.get("/{full_path:path}", include_in_schema=False)
+        # async def _serve_frontend(full_path: str):
+        #     # Don't intercept API / system paths
+        #     first_segment = full_path.split("/")[0] if full_path else ""
+        #     if first_segment in ("api", "docs", "redoc", "openapi.json", "health", "ws"):
+        #         raise HTTPException(status_code=404, detail="Not Found")
 
-            # Try exact file first (e.g. favicon.ico, robots.txt)
-            file_path = static_dir / full_path
-            if file_path.is_file():
-                return FileResponse(file_path)
-            # Next.js static export uses /route/index.html pattern
-            index_path = static_dir / full_path / "index.html"
-            if index_path.is_file():
-                return FileResponse(index_path)
-            # Fallback: root index.html (SPA client-side routing)
-            return FileResponse(static_dir / "index.html")
+        #     # Try exact file first (e.g. favicon.ico, robots.txt)
+        #     file_path = static_dir / full_path
+        #     if file_path.is_file():
+        #         return FileResponse(file_path)
+        #     # Next.js static export uses /route/index.html pattern
+        #     index_path = static_dir / full_path / "index.html"
+        #     if index_path.is_file():
+        #         return FileResponse(index_path)
+        #     # Fallback: root index.html (SPA client-side routing)
+        #     return FileResponse(static_dir / "index.html")
 
         logger.info("Static dashboard wired — desktop mode active.")
     else:

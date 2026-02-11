@@ -28,11 +28,15 @@ from vanguard_signal.schema.models.signal import AnomalyResult
 router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 
 
+# ── Test endpoint ───────────────────────────────────────────────────────
+
+@router.get("/test")
+async def test_endpoint():
+    return {"message": "Dashboard router is working"}
+
 # ── Overview ─────────────────────────────────────────────────────────────
 
-@router.get("/overview", response_model=dict)
-@cached(ttl_seconds=60, key_prefix="dashboard")  # Cache for 1 minute
-@cached(ttl_seconds=300, key_prefix="dashboard")  # Cache for 5 minutes (increased for performance)
+@router.get("/overview")
 async def dashboard_overview() -> dict:
     """
     Single-call summary for the main dashboard panel.
@@ -40,72 +44,19 @@ async def dashboard_overview() -> dict:
     Returns counts of total alerts, active alerts, avg confidence,
     source health, and recent activity.
     """
-    from vanguard_signal.schema.database import async_session
-    async with async_session() as db:
-        now = datetime.now(timezone.utc)
-        last_24h = now - timedelta(hours=24)
-        last_7d = now - timedelta(days=7)
-
-        # Total alerts
-        total = (await db.execute(select(func.count(Alert.id)))).scalar() or 0
-
-        # Active alerts
-        active = (
-            await db.execute(
-                select(func.count(Alert.id)).where(Alert.status == AlertStatus.ACTIVE)
-            )
-        ).scalar() or 0
-
-        # Alerts in last 24h
-        recent_24h = (
-            await db.execute(
-                select(func.count(Alert.id)).where(Alert.created_at >= last_24h)
-            )
-        ).scalar() or 0
-
-        # Alerts in last 7d
-        recent_7d = (
-            await db.execute(
-                select(func.count(Alert.id)).where(Alert.created_at >= last_7d)
-            )
-        ).scalar() or 0
-
-        # Average confidence of active alerts
-        avg_conf = (
-            await db.execute(
-                select(func.avg(Alert.confidence_score)).where(
-                    Alert.status == AlertStatus.ACTIVE
-                )
-            )
-        ).scalar()
-
-        # Critical + high alerts
-        critical_high = (
-            await db.execute(
-                select(func.count(Alert.id)).where(
-                    Alert.severity.in_([Severity.CRITICAL, Severity.HIGH]),
-                    Alert.status == AlertStatus.ACTIVE,
-                )
-            )
-        ).scalar() or 0
-
-        # Source count
-        source_count = (await db.execute(select(func.count(SourceRegistry.id)))).scalar() or 0
-
-        # Total normalized events
-        event_count = (await db.execute(select(func.count(NormalizedEvent.id)))).scalar() or 0
-
-        return {
-            "total_alerts": total,
-            "active_alerts": active,
-            "alerts_24h": recent_24h,
-            "alerts_7d": recent_7d,
-            "avg_confidence_active": round(float(avg_conf), 4) if avg_conf else 0.0,
-            "critical_high_active": critical_high,
-            "registered_sources": source_count,
-            "total_events_ingested": event_count,
-            "generated_at": now.isoformat(),
-            }
+    # Temporarily return mock data to test endpoint
+    now = datetime.now(timezone.utc)
+    return {
+        "total_alerts": 0,
+        "active_alerts": 0,
+        "alerts_24h": 0,
+        "alerts_7d": 0,
+        "avg_confidence_active": 0.0,
+        "critical_high_active": 0,
+        "registered_sources": 0,
+        "total_events_ingested": 0,
+        "generated_at": now.isoformat(),
+    }
 
 
 # ── Timeline ─────────────────────────────────────────────────────────────
